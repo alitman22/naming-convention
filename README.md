@@ -103,11 +103,6 @@ Wiki pages and documentation don't prevent drift. You must enforce conventions p
 
 ---
 
-### Final Thoughts
-Boring infrastructure is reliable infrastructure. Save the creativity for the application logic, and leave the infrastructure taxonomy to strict, predictable patterns.
-
----
-
 ## ✅ Executable Enforcement in This Repository
 
 This repository does not stop at philosophy. It includes production-style, policy-as-code enforcement so naming drift is blocked automatically in pull requests and during Terraform planning.
@@ -170,4 +165,7 @@ Expected behavior:
 
 ---
 
-**Author:** Ali Fattahi
+### Final Thoughts
+Boring infrastructure is reliable infrastructure. Save the creativity for the application logic, and leave the infrastructure taxonomy to strict, predictable patterns.
+
+---
