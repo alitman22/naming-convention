@@ -105,3 +105,69 @@ Wiki pages and documentation don't prevent drift. You must enforce conventions p
 
 ### Final Thoughts
 Boring infrastructure is reliable infrastructure. Save the creativity for the application logic, and leave the infrastructure taxonomy to strict, predictable patterns.
+
+---
+
+## ✅ Executable Enforcement in This Repository
+
+This repository does not stop at philosophy. It includes production-style, policy-as-code enforcement so naming drift is blocked automatically in pull requests and during Terraform planning.
+
+### Enforced Naming Contract
+
+All infrastructure names must follow:
+
+`[environment]-[region]-[domain]-[component]-[resource_type]-[instance]`
+
+Example:
+
+`prod-usw2-billing-api-vm-01`
+
+Validation regex used by policy and Terraform:
+
+`^[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-[0-9]{2}$`
+
+### What Is Implemented
+
+1. **OPA/Conftest Policy**
+	* File: `policies/naming_rules.rego`
+	* Denies Kubernetes or Terraform resource creation when a name is non-compliant.
+	* Returns a clear, developer-friendly error showing required format and a valid example.
+
+2. **GitHub Actions CI Gate**
+	* File: `.github/workflows/enforce-naming-policy.yaml`
+	* Triggers on pull requests to `main`.
+	* Installs `conftest` and evaluates `manifests/` against `policies/`.
+	* Fails the PR check immediately on policy violations.
+
+3. **Terraform Native Validation**
+	* File: `terraform/variables.tf`
+	* Uses Terraform `validation {}` with `regex()` to reject bad `service_name` values during `terraform plan`.
+	* Prevents invalid names from reaching apply.
+
+4. **Test Fixtures for CI Demonstration**
+	* File: `manifests/bad-example.yaml` (intentionally invalid: `gandalf`)
+	* File: `manifests/good-example.yaml` (valid: `prod-usw2-core-auth-api-01`)
+
+### Why This Systemically Guarantees Future Naming
+
+* **Shift-left enforcement:** invalid names are blocked at PR time, before merge.
+* **Runtime consistency:** Terraform validation catches bad names during plan, before infrastructure changes.
+* **No manual policing required:** conventions are encoded as deterministic policy, not dependent on reviewer memory.
+* **Drift resistance:** every future change is checked by the same rule set, every time.
+
+### Local Verification (Optional)
+
+You can run the same checks locally:
+
+```bash
+conftest test manifests --policy policies
+```
+
+Expected behavior:
+
+* `bad-example.yaml` fails with a naming error.
+* `good-example.yaml` passes.
+
+---
+
+**Author:** Ali Fattahi

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # Compliant with [environment]-[region]-[domain]-[component]-[resource_type]-[instance].
+  name: prod-usw2-core-auth-api-01
+  labels:
+    app: prod-usw2-core-auth-api-01
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prod-usw2-core-auth-api-01
+  template:
+    metadata:
+      labels:
+        app: prod-usw2-core-auth-api-01
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27-alpine
+          ports:
+            - containerPort: 80

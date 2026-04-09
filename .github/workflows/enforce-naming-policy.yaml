@@ -1,0 +1,34 @@
+name: Enforce Naming Policy
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  conftest-naming-check:
+    name: Validate Infrastructure Naming Convention
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install conftest
+        env:
+          CONFTEST_VERSION: "0.56.0"
+        run: |
+          set -euo pipefail
+          curl -sSL -o conftest.tar.gz "https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}/conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz"
+          tar -xzf conftest.tar.gz conftest
+          sudo mv conftest /usr/local/bin/conftest
+          conftest --version
+
+      - name: Run naming policy on manifests directory
+        run: |
+          set -euo pipefail
+          # This exits non-zero on any policy denial, failing the PR check.
+          conftest test manifests --policy policies --output table

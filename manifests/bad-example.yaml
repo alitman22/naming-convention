@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # Intentionally non-compliant to prove policy failure in CI.
+  name: gandalf
+  labels:
+    app: gandalf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gandalf
+  template:
+    metadata:
+      labels:
+        app: gandalf
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27-alpine
+          ports:
+            - containerPort: 80
