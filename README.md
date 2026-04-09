@@ -11,7 +11,7 @@ In the rush to get an MVP out the door or spin up a proof-of-concept, infrastruc
 
 As a Senior DevOps & Infrastructure Engineer, I have seen firsthand how "we'll fix it later" technical debt turns into an operational nightmare. When your infrastructure scales from 10 servers to 1,000, naming conventions stop being a cosmetic preference and become the foundational taxonomy of your entire platform. Inconsistent naming breaks automation, destroys observability, and dramatically increases cognitive load during incident response.
 
-This repository outlines the standards, psychological compromises, and automated enforcements required to build scalable, predictable, and "boring" infrastructure.
+This repository outlines the standards, psychological compromises, security considerations, and automated enforcements required to build scalable, predictable, and "boring" infrastructure.
 
 ---
 
@@ -61,6 +61,20 @@ Names should be delimited by hyphens (`-`) and flow from macro to micro:
 2. **Hyphens, Not Underscores:** Hyphens are universally accepted in URLs, hostnames, and cloud resource IDs. Underscores are often invalid in DNS.
 3. **No Personal Names:** Never use `ali-test-server`. Map resources to teams and domains, not individuals.
 4. **Build for Parsing:** The hyphen acts as a delimiter, allowing scripts, log aggregators, and monitoring tools to split the string and tag data dynamically.
+
+---
+
+## 🔐 The Security Dilemma: Predictability vs. Vulnerability
+
+A common argument from Security teams is that highly predictable, descriptive names (`prod-billing-db-01.internal.company.com`) hand an attacker a treasure map. If a bad actor gains access to your network and runs a DNS enumeration script, they instantly know exactly where the most valuable targets are. 
+
+This is a valid concern, but the solution is **not** to randomize internal names and break operational visibility. "Security by obscurity" is not security. If your only defense against a database breach is the fact that it is named `x9f8-node`, your architecture is already compromised. 
+
+Here is how we balance predictability for SREs with security against attackers:
+
+1. **Split-Horizon DNS:** Never expose internal infrastructure names to the public internet. Use internal DNS for standard routing (`prod-auth-api`) and randomized, opaque UUIDs or hashed CNAMEs for any external-facing endpoints that map back to the internal load balancer.
+2. **Zero Trust & Network Policies:** Assume the attacker knows the name of the production database. Defend it with strict network segmentation. If `prod-billing-api` is the only service that has a network path and the required mTLS certificate to talk to `prod-billing-db`, knowing the database's name is useless to an attacker sitting on a compromised worker node.
+3. **Strict IAM Boundaries:** Resource names should be tied to strict Identity and Access Management (IAM) roles. An attacker might enumerate a predictable S3 bucket name like `prod-customer-backups`, but without the specific IAM role granted to the backup service, the predictable name provides zero leverage.
 
 ---
 
