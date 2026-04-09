@@ -1,4 +1,5 @@
 # Boring is Beautiful: A Senior Engineer's Guide to Infrastructure Naming Conventions
+<img width="1408" height="768" alt="naming-3" src="https://github.com/user-attachments/assets/40f37b7e-d265-4124-8c3b-3a23d68de9d4" />
 
 **Author:** Ali Fattahi  
 **Role:** Senior Linux System Administrator / DevOps & Infrastructure Engineer  
